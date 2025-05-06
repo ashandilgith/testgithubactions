@@ -1,31 +1,43 @@
-name: Python CI  # <-- Missing in yours
+name: Python App CI
 
-on:              # <-- Entire trigger block is missing in yours
+on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  test: 
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the code
-        uses: actions/checkout@v2
+      # Checkout the code from your repository
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with: 
-          python-version: '3.8'
+      # Set up Python environment
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Install Dependencies
+      # Install dependencies (mirrors your 'install' target)
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
 
-      - name: Run Tests           # <-- Missing in yours
-        run: pytest
+      # Lint the code (mirrors your 'lint' target)
+      - name: Lint with pylint
+        run: |
+          pylint --disable=R,C hello.py
+
+      # Format the code (mirrors your 'format' target)
+      - name: Format with black
+        run: |
+          black --check *.py
+
+      # Run tests (mirrors your 'test' target)
+      - name: Run tests with pytest
+        run: |
+          python -m pytest -vv test_hello.py
